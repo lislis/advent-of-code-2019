@@ -35,3 +35,37 @@ pub fn read_and_parse_one_line(path: &str) -> Vec<usize> {
 	.collect::<Vec<usize>>();
     nums
 }
+
+pub fn read_and_parse_cables(path: &str) -> Vec<Vec<(char, usize)>> {
+    let content = read_file(path);
+    let coords = convert_to_tuples(content);
+    coords
+}
+
+
+fn convert_to_tuples(content: String) -> Vec<Vec<(char, usize)>> {
+    let coords = content.split("\n").collect::<Vec<&str>>();
+    let coords = coords.into_iter()
+    	.take(2)
+    	.map(|n| n.split(',').collect())
+	.map(|n: Vec<&str>| n.into_iter()
+	    .map(|m| {
+	        let mut chars = m.chars().collect::<Vec<char>>();
+	   	let c = chars[0];
+	    	chars.remove(0);
+
+                let mut string = String::new();
+    		for c in chars {
+		    string.push(c);
+    		}
+		
+	        let num = string.parse::<usize>();
+		let num = match num {
+	    	    Ok(number) => number,
+		    Err(_err) => panic!("cannot parse input")
+	    	};
+		(c, num)
+	    }).collect())
+	.collect();
+    coords
+}
