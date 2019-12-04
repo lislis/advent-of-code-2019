@@ -11,5 +11,6 @@ fn main() {
 //    println!("Day 02-1: {}", day02::part_1()); // 3716250
 //    println!("Day 02-2: {}", day02::part_2()); // 6472
 
-    println!("Day 03-1: {}", day03::part_1()); // 3229
+//    println!("Day 03-1: {}", day03::part_1()); // 3229
+    println!("Day 03-2: {}", day03::part_2()); // 32132
 }

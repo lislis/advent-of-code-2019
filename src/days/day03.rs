@@ -103,7 +103,6 @@ fn get_distances(ints: HashSet<Coord>) -> Vec<i64> {
    dists
 }
 
-
 pub fn part_1() -> i64 {
    let instructions = read_and_parse_cables("input-03.txt");
    let intersections = follow_all_cables(instructions);
@@ -113,4 +112,132 @@ pub fn part_1() -> i64 {
    distances.remove(0);  // we still have 0,0 in there ....
    distances[0]
 }
-	
+
+
+
+
+
+
+fn follow_cable_count_steps(cable: &Vec<Vec<Inst>>) -> Cable {
+   let mut pos = (0_i64, 0_i64);
+   let mut steps = 0_usize;
+   
+   let mut hm = Cable::new();
+   for c in cable[0].iter() {
+     match c {
+       ('U', y) => {
+       	 for i in 0..*y {
+	     let p = (pos.0, pos.1 + i as i64);
+	     let s = steps + i;
+	     hm.entry(p).or_insert(s);
+	 }
+         pos = (pos.0, pos.1 + *y as i64);
+	 steps += *y;
+       },
+       ('D', y) => {
+          for i in 0..*y {
+	     let p = (pos.0, pos.1 - i as i64);
+	     let s = steps + i;
+	     hm.entry(p).or_insert(s);
+	  }
+          pos = (pos.0, pos.1 - *y as i64);
+	  steps += *y;
+	},
+       ('R', y) => {
+          for i in 0..*y {
+	     let p = (pos.0 + i as i64, pos.1);
+	     let s = steps + i;
+	     hm.entry(p).or_insert(s);
+	  }
+       	  pos = (pos.0 + *y as i64, pos.1);
+      	  steps += *y;
+	},
+       ('L', y) => {
+       	  for i in 0..*y {
+	     let p = (pos.0 - i as i64, pos.1);
+	     let s = steps + i;
+	     hm.entry(p).or_insert(s);
+	  }   
+       	  pos = (pos.0 - *y as i64, pos.1);
+	  steps += *y;
+	}
+       _ => {}
+     };
+   };
+
+   pos = (0, 0);
+   steps = 0;
+   let mut matches = Cable::new();
+
+
+   for c in cable[1].iter() {
+     match c {
+       ('U', y) => {
+       	 for i in 0..*y {
+	     let p = (pos.0, pos.1 + i as i64);
+	     let s = steps + i;
+	     if hm.contains_key(&p) {
+	     	let prev_s = hm.get(&p).unwrap();
+	     	matches.entry(p).or_insert(prev_s + s);
+	     }
+	 }
+         pos = (pos.0, pos.1 + *y as i64);
+	 steps += *y;
+       },
+       ('D', y) => {
+          for i in 0..*y {
+	     let p = (pos.0, pos.1 - i as i64);
+	     let s = steps + i;
+	     if hm.contains_key(&p) {
+	     	let prev_s = hm.get(&p).unwrap();
+	     	matches.entry(p).or_insert(prev_s + s);
+	     }
+	  }
+          pos = (pos.0, pos.1 - *y as i64);
+	  steps += *y;
+	},
+       ('R', y) => {
+          for i in 0..*y {
+	     let p = (pos.0 + i as i64, pos.1);
+	     let s = steps + i;
+	     if hm.contains_key(&p) {
+	     	let prev_s = hm.get(&p).unwrap();
+	     	matches.entry(p).or_insert(prev_s + s);
+	     }
+	  }
+       	  pos = (pos.0 + *y as i64, pos.1);
+	  steps += *y;
+	},
+       ('L', y) => {
+       	  for i in 0..*y {
+	     let p = (pos.0 - i as i64, pos.1);
+	     let s = steps + i;
+	     if hm.contains_key(&p) {
+	     	let prev_s = hm.get(&p).unwrap();
+	     	matches.entry(p).or_insert(prev_s + s);
+	     }
+	  }   
+       	  pos = (pos.0 - *y as i64, pos.1);
+	  steps += *y;
+	}
+       _ => {}
+     };
+   }
+
+  matches
+}
+
+
+
+
+pub fn part_2() -> usize {
+    let instructions = read_and_parse_cables("input-03.txt");
+
+    let matches = follow_cable_count_steps(&instructions);
+
+    let mut steps = matches.values().map(|n| *n).collect::<Vec<usize>>();
+    steps.sort();
+    steps.remove(0);
+    
+    steps[0]
+}
